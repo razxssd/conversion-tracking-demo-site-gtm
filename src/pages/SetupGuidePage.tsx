@@ -9,8 +9,8 @@ import { CodeBlock } from '../components/CodeBlock'
 // only real work is firing conversions. This guide leads with that.
 // ---------------------------------------------------------------------------
 
-const SDK_SRC = 'https://track.rebrandly.click/sdk/latest/rbly.min.js'
-const SDK_SRC_TEST = 'https://track.test.rebrandly.click/sdk/latest/rbly.min.js'
+const SDK_SRC = 'https://cdn.rebrandly.com/analytics/sdk/v1/rbly.min.js'
+const SDK_SRC_TEST = 'https://cdn.rebrandly.com/analytics/sdk/v1-staging/rbly.min.js'
 
 const LOADER_TAG = `<script
   src="${SDK_SRC}"
