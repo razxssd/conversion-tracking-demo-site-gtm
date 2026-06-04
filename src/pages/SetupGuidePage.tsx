@@ -12,9 +12,18 @@ import { CodeBlock } from '../components/CodeBlock'
 const SDK_SRC = 'https://cdn.rebrandly.com/analytics/sdk/v1/rbly.min.js'
 const SDK_SRC_TEST = 'https://cdn.rebrandly.com/analytics/sdk/v1-staging/rbly.min.js'
 
-const LOADER_TAG = `<script
-  src="${SDK_SRC}"
-  data-api-key="YOUR_PUBLIC_API_KEY">
+// Inside GTM the SDK must be initialised EXPLICITLY. The data-api-key
+// auto-init reads document.currentScript, which is null for GTM-injected
+// scripts, so it never runs. Load the script, then call rbly.init() on load.
+const LOADER_TAG = `<script>
+  (function () {
+    var s = document.createElement('script');
+    s.src = '${SDK_SRC}';
+    s.onload = function () {
+      window.rbly.init({ apiKey: 'YOUR_PUBLIC_API_KEY' });
+    };
+    document.head.appendChild(s);
+  })();
 </script>`
 
 // One tag handles every conversion: read the whole object from a single data
@@ -89,6 +98,21 @@ export function SetupGuidePage() {
         <code className="bg-gray-100 px-1 rounded">Initialization - All Pages</code>.
       </p>
       <CodeBlock label="Custom HTML tag — Rebrandly SDK Loader" code={LOADER_TAG} />
+      <Callout tone="warn" title="Inside GTM, call init() — don’t use data-api-key">
+        <p>
+          The one-line <code className="bg-amber-100 px-1 rounded">data-api-key</code> auto-init
+          (great for a direct <code>&lt;script&gt;</code> on a site) <strong>does not work inside
+          GTM</strong>: GTM injects the script asynchronously, so{' '}
+          <code className="bg-amber-100 px-1 rounded">document.currentScript</code> is{' '}
+          <code className="bg-amber-100 px-1 rounded">null</code> and auto-init silently never runs.
+          Symptom: the debug panel shows <strong>SDK loaded: yes</strong> but{' '}
+          <code className="bg-amber-100 px-1 rounded">getConfig()</code> reports{' '}
+          <code className="bg-amber-100 px-1 rounded">initialized: false, hasApiKey: false</code>.
+          The loader above loads the script and calls{' '}
+          <code className="bg-amber-100 px-1 rounded">rbly.init()</code> on{' '}
+          <code className="bg-amber-100 px-1 rounded">onload</code>, which is the reliable pattern.
+        </p>
+      </Callout>
       <Callout tone="info" title="Page views are now done">
         <p>
           That’s the whole page-view story. The SDK captures the{' '}
@@ -179,6 +203,10 @@ export function SetupGuidePage() {
           [
             'window.rbly is undefined in the conversion tag',
             'Loader didn’t run first. Put it on Initialization - All Pages; the conversion tag already guards with if (window.rbly).',
+          ],
+          [
+            'SDK loaded, but getConfig() says initialized:false / hasApiKey:false',
+            'The data-api-key auto-init doesn’t fire inside GTM (document.currentScript is null for injected scripts). Load the script and call rbly.init({ apiKey }) explicitly on onload — see Step 1.',
           ],
           [
             'Purchases counted twice',
