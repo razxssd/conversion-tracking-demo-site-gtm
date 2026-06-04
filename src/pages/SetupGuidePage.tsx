@@ -45,6 +45,40 @@ const PURCHASE_PUSH = `window.dataLayer.push({
   conversion: { label: 'purchase', value: 49.0, currency: 'USD', orderId: 'ORD-123', plan: 'pro' }
 });`
 
+// --- Alternative path: fire the conversion straight from a GTM Click trigger,
+// reading the conversion off the button's data-* attributes (no data layer).
+const BUY_BUTTON_MARKUP = `<button
+  data-rbly-buy
+  data-rbly-label="purchase"
+  data-rbly-value="49.00"
+  data-rbly-currency="USD"
+  data-rbly-product="plan-pro"
+  data-rbly-product-name="Pro Plan">
+  Buy now
+</button>`
+
+const CLICK_TRIGGER = `Trigger type:  Click - All Elements
+Fire on:       Click Element  matches CSS selector  [data-rbly-buy], [data-rbly-buy] *`
+
+const CLICK_CONVERSION_TAG = `<script>
+  // Reads the conversion straight off the clicked button's data-* attributes.
+  var el = {{Click Element}};
+  el = el && el.closest ? el.closest('[data-rbly-buy]') : el;
+  if (el && window.rbly && window.rbly.getConfig().initialized) {
+    var v = parseFloat(el.getAttribute('data-rbly-value'));
+    window.rbly.convert(
+      el.getAttribute('data-rbly-label') || 'purchase',
+      isNaN(v) ? null : v,
+      el.getAttribute('data-rbly-currency') || null,
+      {
+        productId: el.getAttribute('data-rbly-product'),
+        productName: el.getAttribute('data-rbly-product-name'),
+        source: 'gtm-click'
+      }
+    );
+  }
+</script>`
+
 export function SetupGuidePage() {
   return (
     <div className="max-w-3xl">
@@ -158,6 +192,49 @@ export function SetupGuidePage() {
         <code className="bg-gray-100 px-1 rounded">orderId</code>/<code className="bg-gray-100 px-1 rounded">email</code>,
         so firing the same purchase twice won’t double-count.
       </p>
+
+      <SectionTitle>Alternative — fire on a button click (no data layer)</SectionTitle>
+      <p className="text-gray-700 text-sm">
+        Steps 2–4 above are the recommended path. But you don’t strictly need the data layer: GTM
+        can fire the conversion directly off a <strong>Click trigger</strong>. This is handy when the
+        customer can’t (or won’t) add <code className="bg-gray-100 px-1 rounded">dataLayer.push</code>{' '}
+        calls to their app — as long as the conversion data can live on the element itself.
+      </p>
+      <p className="text-gray-700 text-sm mt-2">
+        This demo marks every buy button with <code className="bg-gray-100 px-1 rounded">data-rbly-*</code>{' '}
+        attributes so GTM can read the whole conversion without scraping the DOM:
+      </p>
+      <CodeBlock label="What the buy button ships with (data-rbly-* hooks)" code={BUY_BUTTON_MARKUP} />
+      <p className="text-gray-700 text-sm">
+        <em>Variables → Configure</em> — enable the built-in{' '}
+        <code className="bg-gray-100 px-1 rounded">Click Element</code> variable. Then add one trigger:
+      </p>
+      <CodeBlock label="Trigger — Click - All Elements" code={CLICK_TRIGGER} />
+      <p className="text-gray-700 text-sm">
+        <em>Tags → New → Custom HTML</em>, attached to that trigger. It reads{' '}
+        <code className="bg-gray-100 px-1 rounded">label</code>/<code className="bg-gray-100 px-1 rounded">value</code>/
+        <code className="bg-gray-100 px-1 rounded">currency</code> off the clicked element and calls the SDK —
+        no Data Layer Variable, no <code className="bg-gray-100 px-1 rounded">dataLayer.push</code>:
+      </p>
+      <CodeBlock label="Custom HTML tag — Rebrandly Conversion (click-based)" code={CLICK_CONVERSION_TAG} />
+      <Callout tone="warn" title="Pick one path — and mind the trade-offs">
+        <ul className="list-disc pl-4 space-y-1">
+          <li>
+            <strong>Don’t enable both</strong> the data-layer conversion tag (Step 4){' '}
+            <em>and</em> this click tag at once, or each purchase counts twice.
+          </li>
+          <li>
+            A <strong>click is intent, not a confirmed payment</strong> — it over-counts failed/abandoned
+            checkouts. For real money, fire after the payment succeeds (a success page or a
+            post-checkout data-layer event).
+          </li>
+          <li>
+            No real <code className="bg-amber-100 px-1 rounded">orderId</code> exists at click time, so
+            cross-system deduplication by order ID won’t align (the SDK’s time-based dedup still guards
+            rapid double-clicks).
+          </li>
+        </ul>
+      </Callout>
 
       <SectionTitle>Step 5 — Test, then publish</SectionTitle>
       <ol className="text-sm text-gray-700 list-decimal pl-5 space-y-1.5">

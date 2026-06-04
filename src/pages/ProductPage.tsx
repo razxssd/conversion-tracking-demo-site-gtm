@@ -67,15 +67,34 @@ export function ProductPage() {
               </p>
             </div>
 
+            {/*
+              The buttons still push a `purchase` event to the data layer (the
+              primary, recommended path). The data-rbly-* attributes are an
+              ADDITIVE hook for the alternative "fire on click, no data layer"
+              GTM setup — a Click trigger can read the whole conversion straight
+              off these attributes without scraping the DOM. See /setup.
+            */}
             <div className="mt-6 space-y-3">
               <button
                 onClick={() => handleBuy(false)}
+                data-rbly-buy=""
+                data-rbly-label="purchase"
+                data-rbly-value={product.price.toFixed(2)}
+                data-rbly-currency={product.currency}
+                data-rbly-product={product.id}
+                data-rbly-product-name={product.name}
                 className="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
               >
                 Buy now
               </button>
               <button
                 onClick={() => handleBuy(true)}
+                data-rbly-buy=""
+                data-rbly-label="purchase"
+                data-rbly-value={product.price.toFixed(2)}
+                data-rbly-currency={product.currency}
+                data-rbly-product={product.id}
+                data-rbly-product-name={product.name}
                 className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-200 transition-colors text-sm"
               >
                 Buy again (fixed order ID — tests SDK dedup)
