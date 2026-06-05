@@ -206,14 +206,42 @@ export function SetupGuidePage() {
         attributes so GTM can read the whole conversion without scraping the DOM:
       </p>
       <CodeBlock label="What the buy button ships with (data-rbly-* hooks)" code={BUY_BUTTON_MARKUP} />
+      <Callout tone="info" title="Heads up: these are two separate GTM menus">
+        <p>
+          The variable lives under <strong>Variables</strong>; the trigger lives under{' '}
+          <strong>Triggers</strong> — two different entries in the left sidebar. The “All Clicks /
+          Some Clicks” choice is in the <strong>trigger</strong>, not in Variables.
+        </p>
+      </Callout>
+      <p className="text-gray-700 text-sm mt-3 font-semibold">a) Enable the Click Element variable</p>
       <p className="text-gray-700 text-sm">
-        <em>Variables → Configure</em> — enable the built-in{' '}
-        <code className="bg-gray-100 px-1 rounded">Click Element</code> variable (GTM needs it for both
-        the trigger condition and the tag). Then <em>Triggers → New → Trigger Configuration</em> and,
-        under the <strong>Click</strong> group, pick <strong>All Elements</strong> — set it to{' '}
-        <strong>Some Clicks</strong> with this condition:
+        Left sidebar → <em>Variables</em> → <em>Configure</em> (Built-In Variables) → tick{' '}
+        <code className="bg-gray-100 px-1 rounded">Click Element</code>. That’s it here — just a
+        checkbox. GTM needs this variable for both the trigger condition and the tag.
       </p>
-      <CodeBlock label="Trigger — Click ▸ All Elements" code={CLICK_TRIGGER} />
+      <p className="text-gray-700 text-sm mt-3 font-semibold">b) Create the Click trigger</p>
+      <ol className="text-sm text-gray-700 list-decimal pl-5 space-y-1">
+        <li>Left sidebar → <em>Triggers</em> → <strong>New</strong> → click <em>Trigger Configuration</em>.</li>
+        <li>
+          In the type list, under the <strong>Click</strong> group, pick <strong>All Elements</strong>{' '}
+          (there is no entry literally called “Click - All Elements”).
+        </li>
+        <li>
+          Set <strong>This trigger fires on</strong> → <strong>Some Clicks</strong>.{' '}
+          <em>This is what reveals the condition fields</em> — on “All Clicks” there’s nowhere to put a selector.
+        </li>
+        <li>Fill the three condition fields exactly as below.</li>
+      </ol>
+      <CodeBlock label="Trigger — Click ▸ All Elements (fires on Some Clicks)" code={CLICK_TRIGGER} />
+      <Callout tone="info" title="Can’t find “matches CSS selector”?">
+        <p>
+          It’s near the bottom of the operator dropdown (below “matches RegEx”). If you’d rather skip
+          CSS selectors entirely: enable the <code className="bg-blue-100 px-1 rounded">Click Text</code>{' '}
+          built-in variable instead and use the condition{' '}
+          <code className="bg-blue-100 px-1 rounded">Click Text · equals · Buy now</code> — simpler, and
+          it matches the primary buy button.
+        </p>
+      </Callout>
       <p className="text-gray-700 text-sm">
         <em>Tags → New → Custom HTML</em>, attached to that trigger. It reads{' '}
         <code className="bg-gray-100 px-1 rounded">label</code>/<code className="bg-gray-100 px-1 rounded">value</code>/
