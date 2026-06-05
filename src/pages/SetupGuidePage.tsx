@@ -57,8 +57,9 @@ const BUY_BUTTON_MARKUP = `<button
   Buy now
 </button>`
 
-const CLICK_TRIGGER = `Trigger type:  Click - All Elements
-Fire on:       Click Element  matches CSS selector  [data-rbly-buy], [data-rbly-buy] *`
+const CLICK_TRIGGER = `Trigger type:  All Elements   (under the "Click" group — NOT a "Click - All Elements" entry)
+This trigger fires on:  Some Clicks
+Condition:  Click Element  matches CSS selector  [data-rbly-buy], [data-rbly-buy] *`
 
 const CLICK_CONVERSION_TAG = `<script>
   // Reads the conversion straight off the clicked button's data-* attributes.
@@ -207,9 +208,12 @@ export function SetupGuidePage() {
       <CodeBlock label="What the buy button ships with (data-rbly-* hooks)" code={BUY_BUTTON_MARKUP} />
       <p className="text-gray-700 text-sm">
         <em>Variables → Configure</em> — enable the built-in{' '}
-        <code className="bg-gray-100 px-1 rounded">Click Element</code> variable. Then add one trigger:
+        <code className="bg-gray-100 px-1 rounded">Click Element</code> variable (GTM needs it for both
+        the trigger condition and the tag). Then <em>Triggers → New → Trigger Configuration</em> and,
+        under the <strong>Click</strong> group, pick <strong>All Elements</strong> — set it to{' '}
+        <strong>Some Clicks</strong> with this condition:
       </p>
-      <CodeBlock label="Trigger — Click - All Elements" code={CLICK_TRIGGER} />
+      <CodeBlock label="Trigger — Click ▸ All Elements" code={CLICK_TRIGGER} />
       <p className="text-gray-700 text-sm">
         <em>Tags → New → Custom HTML</em>, attached to that trigger. It reads{' '}
         <code className="bg-gray-100 px-1 rounded">label</code>/<code className="bg-gray-100 px-1 rounded">value</code>/
