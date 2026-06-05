@@ -1,9 +1,7 @@
 import { Link, useLocation } from 'react-router'
-import { getGtmStatus } from '../lib/gtmStatus'
 
 export function Navbar() {
   const location = useLocation()
-  const status = getGtmStatus()
 
   const linkClass = (path: string) =>
     `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -30,20 +28,6 @@ export function Navbar() {
               <Link to="/signup" className={linkClass('/signup')}>Start free trial</Link>
               <Link to="/setup" className={linkClass('/setup')}>GTM Setup Guide</Link>
             </div>
-          </div>
-          <div className="hidden sm:flex items-center gap-3 text-xs text-gray-500">
-            <span className="flex items-center gap-1" title="Google Tag Manager container loaded">
-              <span className={`inline-block w-2 h-2 rounded-full ${status.gtmLoaded ? 'bg-green-500' : 'bg-gray-300'}`} />
-              GTM
-            </span>
-            <span className="flex items-center gap-1" title="Rebrandly SDK loaded by GTM">
-              <span className={`inline-block w-2 h-2 rounded-full ${status.sdkLoaded ? 'bg-green-500' : 'bg-gray-300'}`} />
-              SDK
-            </span>
-            <span className="flex items-center gap-1" title="Rebrandly click ID present">
-              <span className={`inline-block w-2 h-2 rounded-full ${status.clickId ? 'bg-green-500' : 'bg-gray-300'}`} />
-              click ID
-            </span>
           </div>
         </div>
       </div>
